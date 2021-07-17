@@ -1,11 +1,13 @@
 import React from "react"
-import { View, Text } from "react-native"
+import { View, Text, TouchableOpacity } from "react-native"
 
-const Login = () => {
+const Login = ({ navigation }) => {
   return (
-    <View>
-      <Text>Login</Text>
-    </View>
+    <TouchableOpacity onPress={() => navigation.navigate("CreateAccount")}>
+      <View>
+        <Text>Go to CreateAccount</Text>
+      </View>
+    </TouchableOpacity>
   )
 }
 
