@@ -1,13 +1,36 @@
 import React from "react"
-import { View, Text, TouchableOpacity } from "react-native"
+import { useRef } from "react"
+import { TextInput } from "../components/auth/AuteShared"
+import AuthLayout from "../components/auth/AuthLayout"
 
+// *[ Component ]
 const Login = ({ navigation }) => {
+  // *[ Settings ]
+  const passwordRef = useRef()
+  const usernameRef = useRef()
+  const onNext = (nextInput) => {
+    nextInput?.current?.focus()
+  }
+
+  // *[ Presenter ]*
   return (
-    <TouchableOpacity onPress={() => navigation.navigate("CreateAccount")}>
-      <View>
-        <Text>Go to CreateAccount</Text>
-      </View>
-    </TouchableOpacity>
+    <AuthLayout>
+      <TextInput
+        ref={usernameRef}
+        returnKeyType="next"
+        placeholder="User Name"
+        onSubmitEditing={() => onNext(passwordRef)}
+        placeholderTextColor={"rgba(225, 225, 225, 0.8)"}
+      />
+      <TextInput
+        lastOne={true}
+        secureTextEntry
+        ref={passwordRef}
+        returnKeyType="done"
+        placeholder="Password"
+        placeholderTextColor={"rgba(225, 225, 225, 0.8)"}
+      />
+    </AuthLayout>
   )
 }
 
