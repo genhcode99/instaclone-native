@@ -18,6 +18,7 @@ const Container = styled.View`
 const Logo = styled.Image`
   width: 100%;
   height: 200px;
+  margin: 0 auto;
   max-width: 50%;
   margin-top: 20px;
 `
@@ -33,7 +34,11 @@ const AuthLayout = ({ children }) => {
 
   // *[ Presenter ]*
   return (
-    <TouchableWithoutFeedback onPress={dissmissKeyboard} style={{ flex: 1 }}>
+    <TouchableWithoutFeedback
+      onPress={dissmissKeyboard}
+      style={{ flex: 1 }}
+      disabled={Platform.OS === "web"}
+    >
       <Container>
         <KeyboardAvoidingView
           style={{ width: "100%" }}
