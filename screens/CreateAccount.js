@@ -1,14 +1,13 @@
 import React from "react"
-import { View, Text, TouchableOpacity } from "react-native"
+import styled from "styled-components/native"
+
+const Container = styled.View`
+  flex: 1;
+  background-color: black;
+`
 
 const CreateAccount = ({ navigation }) => {
-  return (
-    <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-      <View>
-        <Text>Go to Login</Text>
-      </View>
-    </TouchableOpacity>
-  )
+  return <Container></Container>
 }
 
 export default CreateAccount

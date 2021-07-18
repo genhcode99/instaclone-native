@@ -6,6 +6,7 @@ import { colors } from "../colors"
 // *[ Styled ]*
 const Container = styled.View`
   flex: 1;
+  padding: 0px 40px;
   align-items: center;
   justify-content: center;
   background-color: black;
@@ -14,18 +15,21 @@ const Logo = styled.Image`
   height: 200px;
   max-width: 50%;
 `
-const CreateAccount = styled.View`
-  padding: 7px 10px;
+const CreateAccount = styled.TouchableOpacity`
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 10px;
   border-radius: 5px;
   background-color: ${colors.blue};
+  opacity: ${(props) => (props.disabled ? "0.5" : "1")};
 `
 const CreateAccountText = styled.Text`
   color: white;
-  font-size: 16px;
   font-weight: 600;
+  text-align: center;
 `
 const LoginLink = styled.Text`
-  margin-top: 10px;
+  margin-top: 20px;
   font-weight: 600;
   color: ${colors.blue};
 `
@@ -39,13 +43,11 @@ const Welcome = ({ navigation }) => {
   return (
     <Container>
       <Logo resizeMode="contain" source={require("../assets/logo.png")} />
-      <TouchableOpacity onPress={onPressCreateAccount}>
-        <CreateAccount>
-          <CreateAccountText>Create Account</CreateAccountText>
-        </CreateAccount>
-      </TouchableOpacity>
+      <CreateAccount disabled={false} onPress={onPressCreateAccount}>
+        <CreateAccountText>Create Account</CreateAccountText>
+      </CreateAccount>
       <TouchableOpacity onPress={onPressLogin}>
-        <LoginLink>Log in</LoginLink>
+        <LoginLink>Log In</LoginLink>
       </TouchableOpacity>
     </Container>
   )
