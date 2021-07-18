@@ -1,9 +1,11 @@
 import React from "react"
 import { useRef } from "react"
 import { Controller, useForm } from "react-hook-form"
+import { Text } from "react-native"
 import { TextInput } from "../components/auth/AuteShared"
 import AuthButton from "../components/auth/AuthButton"
 import AuthLayout from "../components/auth/AuthLayout"
+import FormError from "../components/auth/FormError"
 
 // *[ Component ]
 const Login = ({}) => {
@@ -33,6 +35,10 @@ const Login = ({}) => {
         control={control}
         rules={{
           required: true,
+          minLength: {
+            value: 5,
+            message: "Username should be longer than 5 chars.",
+          },
         }}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
@@ -49,6 +55,8 @@ const Login = ({}) => {
         name="username"
         defaultValue=""
       />
+      <FormError message={errors?.username?.message} />
+      {/* <FormError message={formState.errors?.username?.message} /> */}
 
       {/* PASSWORD */}
       <Controller
@@ -73,9 +81,11 @@ const Login = ({}) => {
         name="password"
         defaultValue=""
       />
+      <FormError message={errors?.password?.message} />
       <AuthButton
         text="Log In"
         disabled={false}
+        loading={true}
         onPress={handleSubmit(onSubmit)}
       />
     </AuthLayout>

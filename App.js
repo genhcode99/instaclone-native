@@ -5,8 +5,9 @@ import { Asset } from "expo-asset"
 import { Ionicons } from "@expo/vector-icons"
 import LoggedOutNav from "./navigators/LoggedOutNav"
 import { NavigationContainer } from "@react-navigation/native"
-import { Appearance, AppearanceProvider } from "react-native-appearance"
 import { StatusBar } from "react-native"
+import { ApolloProvider } from "@apollo/client"
+import client from "./apollo"
 
 export default function App() {
   // *[ States ]*
@@ -32,11 +33,11 @@ export default function App() {
   }
   // *[ Presenter ]*
   return (
-    <>
+    <ApolloProvider client={client}>
       <StatusBar barStyle={"light-content"} />
       <NavigationContainer>
         <LoggedOutNav />
       </NavigationContainer>
-    </>
+    </ApolloProvider>
   )
 }

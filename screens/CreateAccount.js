@@ -4,6 +4,7 @@ import { Controller, useForm } from "react-hook-form"
 import { TextInput } from "../components/auth/AuteShared"
 import AuthButton from "../components/auth/AuthButton"
 import AuthLayout from "../components/auth/AuthLayout"
+import FormError from "../components/auth/FormError"
 
 // *[ Component ]*
 
@@ -24,7 +25,7 @@ const CreateAccount = ({ navigation }) => {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm()
+  } = useForm({ mode: "onChange" })
   const onSubmit = (data) => console.log(data)
 
   //*[ Presenter ]*
@@ -51,6 +52,7 @@ const CreateAccount = ({ navigation }) => {
         name="firstName"
         defaultValue=""
       />
+      <FormError message={errors?.firstName?.message} />
 
       {/* LASTNAME */}
       <Controller
@@ -74,12 +76,17 @@ const CreateAccount = ({ navigation }) => {
         name="lastName"
         defaultValue=""
       />
+      <FormError message={errors?.lastName?.message} />
 
       {/* USERNAME */}
       <Controller
         control={control}
         rules={{
           required: true,
+          minLength: {
+            value: 5,
+            message: "Username should be longer than 5 chars.",
+          },
         }}
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
@@ -97,6 +104,7 @@ const CreateAccount = ({ navigation }) => {
         name="username"
         defaultValue=""
       />
+      <FormError message={errors?.username?.message} />
 
       {/* EMAIL */}
       <Controller
@@ -121,6 +129,7 @@ const CreateAccount = ({ navigation }) => {
         name="email"
         defaultValue=""
       />
+      <FormError message={errors?.email?.message} />
 
       {/* PASSWORD */}
       <Controller
@@ -145,9 +154,12 @@ const CreateAccount = ({ navigation }) => {
         name="password"
         defaultValue=""
       />
+      <FormError message={errors?.password?.message} />
+
       <AuthButton
         text="Create Account"
         disabled={false}
+        loading={true}
         onPress={handleSubmit(onSubmit)}
       />
     </AuthLayout>
