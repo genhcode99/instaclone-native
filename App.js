@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons"
 import LoggedOutNav from "./navigators/LoggedOutNav"
 import { NavigationContainer } from "@react-navigation/native"
 import { Appearance, AppearanceProvider } from "react-native-appearance"
+import { StatusBar } from "react-native"
 
 export default function App() {
   // *[ States ]*
@@ -29,12 +30,13 @@ export default function App() {
       />
     )
   }
-  // *[Settings]*
-
   // *[ Presenter ]*
   return (
-    <NavigationContainer>
-      <LoggedOutNav />
-    </NavigationContainer>
+    <>
+      <StatusBar barStyle={"light-content"} />
+      <NavigationContainer>
+        <LoggedOutNav />
+      </NavigationContainer>
+    </>
   )
 }
