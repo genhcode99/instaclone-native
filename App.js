@@ -5,6 +5,7 @@ import { Asset } from "expo-asset"
 import { Ionicons } from "@expo/vector-icons"
 import LoggedOutNav from "./navigators/LoggedOutNav"
 import { NavigationContainer } from "@react-navigation/native"
+import { Appearance, AppearanceProvider } from "react-native-appearance"
 
 export default function App() {
   // *[ States ]*
@@ -28,6 +29,7 @@ export default function App() {
       />
     )
   }
+  // *[Settings]*
 
   // *[ Presenter ]*
   return (
