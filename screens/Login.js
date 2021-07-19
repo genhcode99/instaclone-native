@@ -1,30 +1,64 @@
+import { fromPromise, gql, useMutation, useReactiveVar } from "@apollo/client"
+import { isCompositeType } from "graphql"
 import React from "react"
 import { useRef } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { Text } from "react-native"
+import { isLoggedInVar } from "../apollo"
 import { TextInput } from "../components/auth/AuteShared"
 import AuthButton from "../components/auth/AuthButton"
 import AuthLayout from "../components/auth/AuthLayout"
 import FormError from "../components/auth/FormError"
 
+// *[ GraphQl ]*
+const LOGIN_MUTATION = gql`
+  mutation login($username: String!, $password: String!) {
+    login(username: $username, password: $password) {
+      ok
+      authorization
+      error
+    }
+  }
+`
+
 // *[ Component ]
 const Login = ({}) => {
   // *[ Settings ]
 
-  // *. Keyboard return 시 다음 Input Focus
-  const passwordRef = useRef()
-  const onNext = (nextInput) => {
-    nextInput?.current?.focus()
-  }
-
-  // *. useForm
+  // Login
   const {
     control,
     handleSubmit,
+    setError,
+    formState,
     formState: { errors },
   } = useForm({ mode: "onChange" })
+
+  const onCompleted = (data) => {
+    const {
+      login: { ok, authorization, error },
+    } = data
+    if (!ok) {
+      return setError("result", { message: error })
+    }
+    if (ok) {
+      isLoggedInVar(true)
+    }
+  }
+  const [logInMutation, { loading }] = useMutation(LOGIN_MUTATION, {
+    onCompleted,
+  })
+
   const onSubmit = (data) => {
-    console.log(data)
+    if (!loading) {
+      logInMutation({ variables: { ...data } })
+    }
+  }
+
+  // Keyboard return 시 다음 Input Focus
+  const passwordRef = useRef()
+  const onNext = (nextInput) => {
+    nextInput?.current?.focus()
   }
 
   // *[ Presenter ]*
@@ -84,10 +118,11 @@ const Login = ({}) => {
       <FormError message={errors?.password?.message} />
       <AuthButton
         text="Log In"
-        disabled={false}
-        loading={true}
+        disabled={!formState.isValid || loading}
+        loading={loading}
         onPress={handleSubmit(onSubmit)}
       />
+      <FormError message={errors?.result?.message} />
     </AuthLayout>
   )
 }

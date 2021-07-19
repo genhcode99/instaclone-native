@@ -1,7 +1,9 @@
-import { ApolloClient, InMemoryCache } from "@apollo/client"
+import { ApolloClient, InMemoryCache, makeVar } from "@apollo/client"
+
+export const isLoggedInVar = makeVar(false)
 
 const client = new ApolloClient({
-  uri: "https://06ed4a036423.ngrok.io/graphql",
+  uri: "https://896331ed5b9f.ngrok.io/graphql",
   cache: new InMemoryCache(),
 })
 

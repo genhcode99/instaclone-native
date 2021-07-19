@@ -6,12 +6,14 @@ import { Ionicons } from "@expo/vector-icons"
 import LoggedOutNav from "./navigators/LoggedOutNav"
 import { NavigationContainer } from "@react-navigation/native"
 import { StatusBar } from "react-native"
-import { ApolloProvider } from "@apollo/client"
-import client from "./apollo"
+import { ApolloProvider, useReactiveVar } from "@apollo/client"
+import client, { isLoggedInVar } from "./apollo"
+import LoggedInNav from "./navigators/LoggedInNav"
 
 export default function App() {
-  // *[ States ]*
+  // *[ Settings ]*
   const [loading, setLoading] = useState(true)
+  const isLoggedIn = useReactiveVar(isLoggedInVar)
 
   // *[ Loading ]*
   const startAsync = () => {
@@ -36,7 +38,7 @@ export default function App() {
     <ApolloProvider client={client}>
       <StatusBar barStyle={"light-content"} />
       <NavigationContainer>
-        <LoggedOutNav />
+        {isLoggedIn ? <LoggedInNav /> : <LoggedOutNav />}
       </NavigationContainer>
     </ApolloProvider>
   )
