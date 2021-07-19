@@ -1,19 +1,44 @@
+import { gql, useQuery } from "@apollo/client"
 import React from "react"
-import { View, Text } from "react-native"
+import { View, Text, TouchableOpacity } from "react-native"
+import { logUserOut } from "../apollo"
 
-const Feed = () => {
-  return (
-    <View
-      style={{
-        backgroundColor: "black",
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <Text style={{ color: "white" }}>Feed</Text>
-    </View>
-  )
+// *[ GraphQl ]*
+const FEED_QUERY = gql`
+  query seeFeed {
+    seeFeed {
+      id
+      user {
+        username
+        avatar
+      }
+      file
+      caption
+      likes
+      isMine
+      isLiked
+      commentNumber
+      comments {
+        id
+        user {
+          username
+          avatar
+        }
+        payload
+        isMine
+        createdAt
+      }
+      createdAt
+    }
+  }
+`
+
+// *[ Component ]*
+const Feed = ({ navigation }) => {
+  const { data } = useQuery(FEED_QUERY)
+  console.log(data)
+
+  return <Text style={{ color: "white" }}>Photo</Text>
 }
 
 export default Feed

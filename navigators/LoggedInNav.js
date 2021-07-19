@@ -1,12 +1,8 @@
 import React from "react"
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import { Ionicons } from "@expo/vector-icons"
-import Feed from "../screens/Feed"
-import Search from "../screens/Search"
-import Notifications from "../screens/Notifications"
 import { View } from "react-native"
-import Me from "../screens/Me"
-import StackNavFactory from "../components/nav/StackNavFactory"
+import { Ionicons } from "@expo/vector-icons"
+import SharedStackNav from "./SharedStackNav"
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 
 const Taps = createBottomTabNavigator()
 
@@ -34,7 +30,7 @@ const LoggedInNav = () => {
           ),
         }}
       >
-        {() => <StackNavFactory screenName="Feed" />}
+        {() => <SharedStackNav screenName="Feed" />}
       </Taps.Screen>
       <Taps.Screen
         name="Search"
@@ -48,7 +44,7 @@ const LoggedInNav = () => {
           ),
         }}
       >
-        {() => <StackNavFactory screenName="Search" />}
+        {() => <SharedStackNav screenName="Search" />}
       </Taps.Screen>
       <Taps.Screen
         name="Camera"
@@ -75,7 +71,7 @@ const LoggedInNav = () => {
           ),
         }}
       >
-        {() => <StackNavFactory screenName="Notifications" />}
+        {() => <SharedStackNav screenName="Notifications" />}
       </Taps.Screen>
       <Taps.Screen
         name="Me"
@@ -89,7 +85,7 @@ const LoggedInNav = () => {
           ),
         }}
       >
-        {() => <StackNavFactory screenName="Me" />}
+        {() => <SharedStackNav screenName="Me" />}
       </Taps.Screen>
     </Taps.Navigator>
   )
