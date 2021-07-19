@@ -6,8 +6,8 @@ export const authorizationVar = makeVar("")
 
 export const logUserIn = async (authorization) => {
   await AsyncStorage.multiSet([
-    ["authorization", JSON.stringify(authorization)],
-    ["loggedIn", JSON.stringify("yes")],
+    ["authorization", authorization],
+    ["loggedIn", "yes"],
   ])
   isLoggedInVar(true)
   authorizationVar(authorization)
