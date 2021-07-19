@@ -5,6 +5,7 @@ import Feed from "../screens/Feed"
 import Search from "../screens/Search"
 import Notifications from "../screens/Notifications"
 import Profile from "../screens/Profile"
+import { View } from "react-native"
 
 const Taps = createBottomTabNavigator()
 
@@ -25,7 +26,11 @@ const LoggedInNav = () => {
         component={Feed}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons name="home" color={color} size={focused ? 24 : 20} />
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              color={color}
+              size={22}
+            />
           ),
         }}
       />
@@ -34,7 +39,24 @@ const LoggedInNav = () => {
         component={Search}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons name="search" color={color} size={focused ? 24 : 20} />
+            <Ionicons
+              name={focused ? "search" : "search-outline"}
+              color={color}
+              size={22}
+            />
+          ),
+        }}
+      />
+      <Taps.Screen
+        name="Camera"
+        component={View}
+        options={{
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? "camera" : "camera-outline"}
+              color={color}
+              size={26}
+            />
           ),
         }}
       />
@@ -43,7 +65,11 @@ const LoggedInNav = () => {
         component={Notifications}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons name="heart" color={color} size={focused ? 24 : 20} />
+            <Ionicons
+              name={focused ? "heart" : "heart-outline"}
+              color={color}
+              size={22}
+            />
           ),
         }}
       />
@@ -52,7 +78,11 @@ const LoggedInNav = () => {
         component={Profile}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons name="person" color={color} size={focused ? 24 : 20} />
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              color={color}
+              size={22}
+            />
           ),
         }}
       />
