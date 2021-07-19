@@ -1,7 +1,7 @@
 import React from "react"
-import { View, Text } from "react-native"
+import { View, Text, Touchable, TouchableOpacity } from "react-native"
 
-const Search = () => {
+const Search = ({ navigation }) => {
   return (
     <View
       style={{
@@ -12,6 +12,9 @@ const Search = () => {
       }}
     >
       <Text style={{ color: "white" }}>Search</Text>
+      <TouchableOpacity onPress={() => navigation.navigate("Photo")}>
+        <Text style={{ color: "white" }}>Photo</Text>
+      </TouchableOpacity>
     </View>
   )
 }

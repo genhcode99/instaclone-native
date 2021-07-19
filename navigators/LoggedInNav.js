@@ -4,8 +4,9 @@ import { Ionicons } from "@expo/vector-icons"
 import Feed from "../screens/Feed"
 import Search from "../screens/Search"
 import Notifications from "../screens/Notifications"
-import Profile from "../screens/Profile"
 import { View } from "react-native"
+import Me from "../screens/Me"
+import StackNavFactory from "../components/nav/StackNavFactory"
 
 const Taps = createBottomTabNavigator()
 
@@ -23,7 +24,6 @@ const LoggedInNav = () => {
     >
       <Taps.Screen
         name="Feed"
-        component={Feed}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
             <Ionicons
@@ -33,10 +33,11 @@ const LoggedInNav = () => {
             />
           ),
         }}
-      />
+      >
+        {() => <StackNavFactory screenName="Feed" />}
+      </Taps.Screen>
       <Taps.Screen
         name="Search"
-        component={Search}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
             <Ionicons
@@ -46,7 +47,9 @@ const LoggedInNav = () => {
             />
           ),
         }}
-      />
+      >
+        {() => <StackNavFactory screenName="Search" />}
+      </Taps.Screen>
       <Taps.Screen
         name="Camera"
         component={View}
@@ -62,7 +65,6 @@ const LoggedInNav = () => {
       />
       <Taps.Screen
         name="Notifications"
-        component={Notifications}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
             <Ionicons
@@ -72,10 +74,11 @@ const LoggedInNav = () => {
             />
           ),
         }}
-      />
+      >
+        {() => <StackNavFactory screenName="Notifications" />}
+      </Taps.Screen>
       <Taps.Screen
-        name="Profile"
-        component={Profile}
+        name="Me"
         options={{
           tabBarIcon: ({ focused, color, size }) => (
             <Ionicons
@@ -85,7 +88,9 @@ const LoggedInNav = () => {
             />
           ),
         }}
-      />
+      >
+        {() => <StackNavFactory screenName="Me" />}
+      </Taps.Screen>
     </Taps.Navigator>
   )
 }
