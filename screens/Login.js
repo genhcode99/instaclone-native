@@ -4,7 +4,7 @@ import React from "react"
 import { useRef } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { Text } from "react-native"
-import { isLoggedInVar } from "../apollo"
+import { isLoggedInVar, logUserIn } from "../apollo"
 import { TextInput } from "../components/auth/AuteShared"
 import AuthButton from "../components/auth/AuthButton"
 import AuthLayout from "../components/auth/AuthLayout"
@@ -41,7 +41,7 @@ const Login = ({ route: { params } }) => {
     },
   })
 
-  const onCompleted = (data) => {
+  const onCompleted = async (data) => {
     const {
       login: { ok, authorization, error },
     } = data
@@ -49,7 +49,7 @@ const Login = ({ route: { params } }) => {
       return setError("result", { message: error })
     }
     if (ok) {
-      isLoggedInVar(true)
+      await logUserIn(authorization)
     }
   }
   const [logInMutation, { loading }] = useMutation(LOGIN_MUTATION, {
