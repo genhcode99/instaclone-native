@@ -1,3 +1,4 @@
+import { gql, useMutation } from "@apollo/client"
 import React from "react"
 import { useRef } from "react"
 import { Controller, useForm } from "react-hook-form"
@@ -6,12 +7,33 @@ import AuthButton from "../components/auth/AuthButton"
 import AuthLayout from "../components/auth/AuthLayout"
 import FormError from "../components/auth/FormError"
 
-// *[ Component ]*
+//*[ GraphQl ]*
+const CREATE_ACCOUNT_MUTATION = gql`
+  mutation createAccount(
+    $firstName: String!
+    $lastName: String
+    $username: String!
+    $email: String!
+    $password: String!
+  ) {
+    createAccount(
+      firstName: $firstName
+      lastName: $lastName
+      username: $username
+      email: $email
+      password: $password
+    ) {
+      ok
+      error
+    }
+  }
+`
 
+// *[ Component ]*
 const CreateAccount = ({ navigation }) => {
   // *[ Setting ]*
 
-  // *. 키보드 next 터치 시 다음 Input으로 Focus
+  // 키보드 next 터치 시 다음 Input으로 Focus
   const lastNameRef = useRef()
   const usernameRef = useRef()
   const emailRef = useRef()
@@ -20,13 +42,39 @@ const CreateAccount = ({ navigation }) => {
     nextInput?.current?.focus()
   }
 
-  // *. Use Form
+  // Create Account
   const {
     control,
+    setError,
+    clearErrors,
     handleSubmit,
+    formState,
+    getValues,
     formState: { errors },
   } = useForm({ mode: "onChange" })
-  const onSubmit = (data) => console.log(data)
+
+  const onCompleted = (data) => {
+    const {
+      createAccount: { ok, error },
+    } = data
+    const { username, password } = getValues()
+    if (!ok) {
+      return setError("result", { message: error })
+    }
+    if (ok) {
+      navigation.navigate("Login", { username, password })
+    }
+  }
+  const [createAccountMutation, { loading }] = useMutation(
+    CREATE_ACCOUNT_MUTATION,
+    { onCompleted },
+  )
+
+  const onSubmit = (data) => {
+    if (!loading) {
+      createAccountMutation({ variables: { ...data } })
+    }
+  }
 
   //*[ Presenter ]*
   return (
@@ -45,6 +93,7 @@ const CreateAccount = ({ navigation }) => {
             returnKeyType="next"
             autoCapitalize="none"
             placeholder="First Name"
+            onFocus={() => clearErrors("result")}
             onSubmitEditing={() => onNext(lastNameRef)}
             placeholderTextColor={"rgba(225, 225, 225, 0.8)"}
           />
@@ -69,6 +118,7 @@ const CreateAccount = ({ navigation }) => {
             ref={lastNameRef}
             returnKeyType="next"
             placeholder="Last Name"
+            onFocus={() => clearErrors("result")}
             onSubmitEditing={() => onNext(usernameRef)}
             placeholderTextColor={"rgba(225, 225, 225, 0.8)"}
           />
@@ -97,6 +147,7 @@ const CreateAccount = ({ navigation }) => {
             ref={usernameRef}
             returnKeyType="next"
             placeholder="User Name"
+            onFocus={() => clearErrors("result")}
             onSubmitEditing={() => onNext(emailRef)}
             placeholderTextColor={"rgba(225, 225, 225, 0.8)"}
           />
@@ -122,6 +173,7 @@ const CreateAccount = ({ navigation }) => {
             placeholder="Email"
             returnKeyType="next"
             keyboardType="email-address"
+            onFocus={() => clearErrors("result")}
             onSubmitEditing={() => onNext(passwordRef)}
             placeholderTextColor={"rgba(225, 225, 225, 0.8)"}
           />
@@ -147,6 +199,7 @@ const CreateAccount = ({ navigation }) => {
             returnKeyType="done"
             placeholder="Password"
             onChangeText={onChange}
+            onFocus={() => clearErrors("result")}
             onSubmitEditing={handleSubmit(onSubmit)}
             placeholderTextColor={"rgba(225, 225, 225, 0.8)"}
           />
@@ -158,10 +211,11 @@ const CreateAccount = ({ navigation }) => {
 
       <AuthButton
         text="Create Account"
-        disabled={false}
-        loading={true}
+        disabled={!formState.isValid || loading}
+        loading={loading}
         onPress={handleSubmit(onSubmit)}
       />
+      <FormError message={errors?.result?.message} />
     </AuthLayout>
   )
 }

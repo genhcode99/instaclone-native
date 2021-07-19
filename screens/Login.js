@@ -22,7 +22,7 @@ const LOGIN_MUTATION = gql`
 `
 
 // *[ Component ]
-const Login = ({}) => {
+const Login = ({ route: { params } }) => {
   // *[ Settings ]
 
   // Login
@@ -30,9 +30,16 @@ const Login = ({}) => {
     control,
     handleSubmit,
     setError,
+    clearErrors,
     formState,
     formState: { errors },
-  } = useForm({ mode: "onChange" })
+  } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      username: params?.username,
+      password: params?.password,
+    },
+  })
 
   const onCompleted = (data) => {
     const {
@@ -82,6 +89,7 @@ const Login = ({}) => {
             returnKeyType="next"
             placeholder="User Name"
             onChangeText={onChange}
+            onFocus={() => clearErrors("result")}
             onSubmitEditing={() => onNext(passwordRef)}
             placeholderTextColor={"rgba(225, 225, 225, 0.8)"}
           />
@@ -108,6 +116,7 @@ const Login = ({}) => {
             returnKeyType="done"
             placeholder="Password"
             onChangeText={onChange}
+            onFocus={() => clearErrors("result")}
             onSubmitEditing={handleSubmit(onSubmit)}
             placeholderTextColor={"rgba(225, 225, 225, 0.8)"}
           />
