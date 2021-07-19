@@ -7,8 +7,9 @@ import LoggedOutNav from "./navigators/LoggedOutNav"
 import { NavigationContainer } from "@react-navigation/native"
 import { StatusBar } from "react-native"
 import { ApolloProvider, useReactiveVar } from "@apollo/client"
-import client, { isLoggedInVar } from "./apollo"
+import client, { authorizationVar, isLoggedInVar } from "./apollo"
 import LoggedInNav from "./navigators/LoggedInNav"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export default function App() {
   // *[ Settings ]*
@@ -16,18 +17,28 @@ export default function App() {
   const isLoggedIn = useReactiveVar(isLoggedInVar)
 
   // *[ Loading ]*
-  const startAsync = () => {
+
+  const preloadAssets = () => {
     const fontsToLoad = [Ionicons.font]
     const fontsPromises = fontsToLoad.map((font) => Font.loadAsync(font))
     const imagesToLoad = [require("./assets/logo.png")]
     const imagesPromises = imagesToLoad.map((image) => Asset.loadAsync(image))
     return Promise.all([...fontsPromises, ...imagesPromises])
   }
+
+  const preload = async () => {
+    const authorization = await AsyncStorage.getItem("authorization")
+    if (authorization) {
+      isLoggedInVar(true)
+      authorizationVar(authorization)
+    }
+    return preloadAssets()
+  }
   const onFinish = () => setLoading(false)
   if (loading) {
     return (
       <AppLoading
-        startAsync={startAsync}
+        startAsync={preload}
         onFinish={onFinish}
         onError={console.warn}
       />

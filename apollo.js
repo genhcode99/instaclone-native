@@ -2,6 +2,7 @@ import { ApolloClient, InMemoryCache, makeVar } from "@apollo/client"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export const isLoggedInVar = makeVar(false)
+export const authorizationVar = makeVar("")
 
 export const logUserIn = async (authorization) => {
   await AsyncStorage.multiSet([
@@ -9,6 +10,7 @@ export const logUserIn = async (authorization) => {
     ["loggedIn", JSON.stringify("yes")],
   ])
   isLoggedInVar(true)
+  authorizationVar(authorization)
 }
 
 const client = new ApolloClient({
