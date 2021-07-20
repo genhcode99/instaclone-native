@@ -132,7 +132,9 @@ const Photo = ({ id, user, caption, file, isLiked, likes }) => {
           </Action>
         </Actions>
         {likes !== 0 && (
-          <TouchableOpacity onPress={() => navigation.navigate("Likes")}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Likes", { photoId: id })}
+          >
             <Likes>{likes === 1 ? "1 like" : `${likes} likes`}</Likes>
           </TouchableOpacity>
         )}

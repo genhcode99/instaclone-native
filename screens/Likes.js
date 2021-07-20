@@ -1,11 +1,49 @@
-import React from "react"
-import { View, Text } from "react-native"
+import { gql, useQuery } from "@apollo/client"
+import React, { useState } from "react"
+import { Text, View } from "react-native"
+import { FlatList } from "react-native"
+import styled from "styled-components/native"
+import ScreenLayout from "../components/ScreenLayout"
+import UserRow from "../components/UserRow"
+import { USER_FRAGMENT } from "../fragments"
 
-const Likes = () => {
+// [ Styles ]
+
+// [GraphQl]
+const LIKES_QUERY = gql`
+  query seePhotoLikes($id: Int!) {
+    seePhotoLikes(id: $id) {
+      ...UserFragment
+    }
+  }
+  ${USER_FRAGMENT}
+`
+
+const Likes = ({ route }) => {
+  const [refreshing, setRefreshing] = useState(false)
+  const { data, loading, refetch } = useQuery(LIKES_QUERY, {
+    variables: { id: route?.params?.photoId },
+    skip: !route?.params?.photoId,
+  })
+  const renderUser = ({ item: user }) => <UserRow {...user} />
+
+  const onRefresh = async () => {
+    setRefreshing(true)
+    await refetch()
+    setRefreshing(false)
+  }
+
   return (
-    <View>
-      <Text>Likes</Text>
-    </View>
+    <ScreenLayout loading={loading}>
+      <FlatList
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        data={data?.seePhotoLikes}
+        keyExtractor={(item) => "" + item.id}
+        renderItem={renderUser}
+        style={{ width: "100%" }}
+      />
+    </ScreenLayout>
   )
 }
 
