@@ -1,7 +1,15 @@
 import { gql, useQuery } from "@apollo/client"
 import React from "react"
-import { View, Text, TouchableOpacity } from "react-native"
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  FlatList,
+} from "react-native"
+import styled from "styled-components/native"
 import { logUserOut } from "../apollo"
+import ScreenLayout from "../components/ScreenLayout"
 
 // *[ GraphQl ]*
 const FEED_QUERY = gql`
@@ -35,10 +43,24 @@ const FEED_QUERY = gql`
 
 // *[ Component ]*
 const Feed = ({ navigation }) => {
-  const { data } = useQuery(FEED_QUERY)
-  console.log(data)
+  const { data, loading } = useQuery(FEED_QUERY)
+  const renderPhoto = ({ item: photo }) => {
+    return (
+      <View style={{ flex: 1 }}>
+        <Text style={{ color: "white" }}>{photo?.caption}</Text>
+      </View>
+    )
+  }
 
-  return <Text style={{ color: "white" }}>Photo</Text>
+  return (
+    <ScreenLayout loading={loading}>
+      <FlatList
+        data={data?.seeFeed}
+        keyExtractor={(photo) => photo?.id}
+        renderItem={renderPhoto}
+      ></FlatList>
+    </ScreenLayout>
+  )
 }
 
 export default Feed
