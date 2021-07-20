@@ -1,14 +1,6 @@
 import { gql, useQuery } from "@apollo/client"
 import React from "react"
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ActivityIndicator,
-  FlatList,
-} from "react-native"
-import styled from "styled-components/native"
-import { logUserOut } from "../apollo"
+import { FlatList } from "react-native"
 import Photo from "../components/Photo"
 import ScreenLayout from "../components/ScreenLayout"
 
@@ -55,7 +47,7 @@ const Feed = ({ navigation }) => {
         style={{ width: "100%" }}
         showsVerticalScrollIndicator={false}
         data={data?.seeFeed}
-        keyExtractor={(photo) => photo?.id}
+        keyExtractor={(photo) => "" + photo?.id}
         renderItem={renderPhoto}
       ></FlatList>
     </ScreenLayout>
