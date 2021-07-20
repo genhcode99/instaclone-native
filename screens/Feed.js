@@ -6,8 +6,8 @@ import ScreenLayout from "../components/ScreenLayout"
 
 // *[ GraphQl ]*
 const FEED_QUERY = gql`
-  query seeFeed {
-    seeFeed {
+  query seeFeed($offset: Int!) {
+    seeFeed(offset: $offset) {
       id
       user {
         username
@@ -35,8 +35,11 @@ const FEED_QUERY = gql`
 `
 
 // *[ Component ]*
-const Feed = ({ navigation }) => {
-  const { data, loading, refetch } = useQuery(FEED_QUERY)
+const Feed = () => {
+  const { data, loading, refetch, fetchMore } = useQuery(FEED_QUERY, {
+    variables: { offset: 0 },
+  })
+
   const renderPhoto = ({ item: photo }) => {
     return <Photo {...photo} />
   }
@@ -50,6 +53,10 @@ const Feed = ({ navigation }) => {
   return (
     <ScreenLayout loading={loading}>
       <FlatList
+        onEndReachedThreshold={0.1}
+        onEndReached={() =>
+          fetchMore({ variables: { offset: data?.seeFeed?.length } })
+        }
         refreshing={refreshing}
         onRefresh={refresh}
         style={{ width: "100%" }}
