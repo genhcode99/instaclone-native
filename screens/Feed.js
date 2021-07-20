@@ -53,7 +53,7 @@ const Feed = () => {
   return (
     <ScreenLayout loading={loading}>
       <FlatList
-        onEndReachedThreshold={0.1}
+        onEndReachedThreshold={0.4}
         onEndReached={() =>
           fetchMore({ variables: { offset: data?.seeFeed?.length } })
         }
