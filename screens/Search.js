@@ -2,7 +2,13 @@ import { useLazyQuery } from "@apollo/client"
 import { gql } from "@apollo/client/core"
 import React, { useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
-import { ActivityIndicator } from "react-native"
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  useWindowDimensions,
+} from "react-native"
 import styled from "styled-components/native"
 import DismissKeyboard from "../components/DismissKeyboard"
 
@@ -14,7 +20,11 @@ const Container = styled.View`
   background-color: black;
 `
 const Input = styled.TextInput`
-  background-color: white;
+  color: black;
+  padding: 5px 10px;
+  border-radius: 7px;
+  width: ${(props) => props.width / 1.5}px;
+  background-color: rgba(225, 225, 225, 1);
 `
 const MessageContainer = styled.View``
 const MessageText = styled.Text`
@@ -34,6 +44,7 @@ const SEARCH_PHOTOS = gql`
 `
 
 const Search = ({ navigation }) => {
+  const { width } = useWindowDimensions()
   const {
     control,
     handleSubmit,
@@ -60,11 +71,12 @@ const Search = ({ navigation }) => {
           onChangeText={onChange}
           value={value}
           // 옵션
+          width={width}
           autoCapitalize="none"
           returnKeyType="search"
           autoCorrect={false}
           placeholder="Search photos"
-          placeholderTextColor="black"
+          placeholderTextColor="rgba(0, 0, 0, 0.8)"
           onSubmitEditing={handleSubmit(onVaild)}
         />
       )}
@@ -75,8 +87,16 @@ const Search = ({ navigation }) => {
   useEffect(() => {
     navigation.setOptions({ headerTitle: SearchBox })
   }, [])
-
-  console.log(data)
+  const renderItem = ({ item: photo }) => (
+    <>
+      <TouchableOpacity>
+        <Image
+          source={{ uri: photo.file }}
+          style={{ width: width / 3, height: width / 3 }}
+        />
+      </TouchableOpacity>
+    </>
+  )
 
   return (
     <DismissKeyboard>
@@ -92,10 +112,19 @@ const Search = ({ navigation }) => {
             <MessageText>Searching by keyword</MessageText>
           </MessageContainer>
         ) : null}
-        {data?.searchPhotos !== undefined && data?.searchPhotos.length === 0 ? (
-          <MessageContainer>
-            <MessageText>Could not find anything.</MessageText>
-          </MessageContainer>
+        {data?.searchPhotos !== undefined ? (
+          data?.searchPhotos.length === 0 ? (
+            <MessageContainer>
+              <MessageText>Could not find anything.</MessageText>
+            </MessageContainer>
+          ) : (
+            <FlatList
+              numColumns={3}
+              data={data?.searchPhotos}
+              keyExtractor={(photo) => "" + photo.id}
+              renderItem={renderItem}
+            />
+          )
         ) : null}
       </Container>
     </DismissKeyboard>
