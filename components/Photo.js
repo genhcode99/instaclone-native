@@ -104,16 +104,16 @@ const Photo = ({ id, user, caption, file, isLiked, likes }) => {
     update: updateToggleLike,
   })
 
+  const goToProfile = () => {
+    navigation.navigate("Profile", {
+      username: user.username,
+      is: user.id,
+    })
+  }
+
   return (
     <Container>
-      <Header
-        onPress={() =>
-          navigation.navigate("Profile", {
-            username: user.username,
-            is: user.id,
-          })
-        }
-      >
+      <Header onPress={goToProfile}>
         <UserAvatar resizeMode="cover" source={{ uri: user.avatar }} />
         <Username>{user.username}</Username>
       </Header>
@@ -146,14 +146,7 @@ const Photo = ({ id, user, caption, file, isLiked, likes }) => {
           </TouchableOpacity>
         )}
         <Caption>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("Profile", {
-                username: user.username,
-                is: user.id,
-              })
-            }
-          >
+          <TouchableOpacity onPress={goToProfile}>
             <Username>{user.username}</Username>
           </TouchableOpacity>
           <CaptionText>{caption}</CaptionText>

@@ -10,7 +10,11 @@ import { ApolloProvider, useReactiveVar } from "@apollo/client"
 import client, { authorizationVar, isLoggedInVar } from "./apollo"
 import LoggedInNav from "./navigators/LoggedInNav"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { AsyncStorageWrapper, persistCache } from "apollo3-cache-persist"
+import {
+  AsyncStorageWrapper,
+  CachePersistor,
+  persistCache,
+} from "apollo3-cache-persist"
 import { cache } from "./apollo"
 
 export default function App() {
@@ -28,16 +32,21 @@ export default function App() {
     return Promise.all([...fontsPromises, ...imagesPromises])
   }
 
+  const persistor = new CachePersistor({
+    cache,
+    storage: new AsyncStorageWrapper(AsyncStorage),
+  })
+
   const preload = async () => {
     const authorization = await AsyncStorage.getItem("authorization")
     if (authorization) {
       isLoggedInVar(true)
       authorizationVar(authorization)
     }
+    await persistor.purge()
     await persistCache({
       cache,
       storage: new AsyncStorageWrapper(AsyncStorage),
-      serialize: false,
     })
     return preloadAssets()
   }
