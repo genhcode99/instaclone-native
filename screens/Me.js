@@ -1,7 +1,12 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { View, Text } from "react-native"
+import useUser from "../hooks/useUser"
 
-const Me = () => {
+const Me = ({ navigation }) => {
+  const { data } = useUser()
+  useEffect(() => {
+    navigation.setOptions({ title: data?.me?.username })
+  }, [])
   return (
     <View
       style={{

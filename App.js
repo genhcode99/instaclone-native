@@ -32,10 +32,10 @@ export default function App() {
     return Promise.all([...fontsPromises, ...imagesPromises])
   }
 
-  const persistor = new CachePersistor({
-    cache,
-    storage: new AsyncStorageWrapper(AsyncStorage),
-  })
+  // const persistor = new CachePersistor({
+  //   cache,
+  //   storage: new AsyncStorageWrapper(AsyncStorage),
+  // })
 
   const preload = async () => {
     const authorization = await AsyncStorage.getItem("authorization")
@@ -43,7 +43,6 @@ export default function App() {
       isLoggedInVar(true)
       authorizationVar(authorization)
     }
-    await persistor.purge()
     await persistCache({
       cache,
       storage: new AsyncStorageWrapper(AsyncStorage),

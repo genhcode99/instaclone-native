@@ -11,6 +11,7 @@ const FEED_QUERY = gql`
       id
       user {
         id
+        bio
         username
         avatar
       }
