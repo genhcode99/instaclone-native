@@ -43,10 +43,11 @@ export default function App() {
       isLoggedInVar(true)
       authorizationVar(authorization)
     }
-    await persistCache({
-      cache,
-      storage: new AsyncStorageWrapper(AsyncStorage),
-    })
+    // await persistor.purge()
+    // await persistCache({
+    //   cache,
+    //   storage: new AsyncStorageWrapper(AsyncStorage),
+    // })
     return preloadAssets()
   }
   const onFinish = () => setLoading(false)
