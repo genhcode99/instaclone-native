@@ -1,17 +1,29 @@
+import { gql, useLazyQuery } from "@apollo/client"
 import React, { useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
 import styled from "styled-components/native"
 import DismissKeyboard from "../components/DismissKeyboard"
 
-const Input = styled.TextInput`
-  background-color: white;
-`
-
+// STYLES
 const Container = styled.View`
   flex: 1;
   align-items: center;
   justify-content: center;
   background-color: black;
+`
+const Input = styled.TextInput`
+  background-color: white;
+`
+
+// GRAPHQL
+const SEARCH_PHOTOS = gql`
+  query searchUsers($keyword: String!){
+    searchUsers(keyword: $keyword){
+      id
+      file
+    }
+  }
+)
 `
 
 const Search = ({ navigation }) => {
@@ -20,6 +32,8 @@ const Search = ({ navigation }) => {
     handleSubmit,
     formState: { errors },
   } = useForm()
+
+  const [searchUsersQuery, { loading, data }] = useLazyQuery(SEARCH_PHOTOS)
 
   const SearchBox = () => (
     <Controller

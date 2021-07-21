@@ -1,12 +1,14 @@
 import React from "react"
-import { View } from "react-native"
+import { Image, View } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import SharedStackNav from "./SharedStackNav"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import useUser from "../hooks/useUser"
 
 const Taps = createBottomTabNavigator()
 
 const LoggedInNav = () => {
+  const { data } = useUser()
   return (
     <Taps.Navigator
       tabBarOptions={{
@@ -76,13 +78,25 @@ const LoggedInNav = () => {
       <Taps.Screen
         name="Me"
         options={{
-          tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons
-              name={focused ? "person" : "person-outline"}
-              color={color}
-              size={22}
-            />
-          ),
+          tabBarIcon: ({ focused, color, size }) =>
+            data?.me?.avatar ? (
+              <Image
+                resizeMode="cover"
+                source={{ uri: data?.me?.avatar }}
+                style={{
+                  height: 25,
+                  width: 25,
+                  borderRadius: 13,
+                  opacity: focused ? 1 : 0.6,
+                }}
+              />
+            ) : (
+              <Ionicons
+                name={focused ? "person" : "person-outline"}
+                color={color}
+                size={22}
+              />
+            ),
         }}
       >
         {() => <SharedStackNav screenName="Me" />}
