@@ -8,7 +8,11 @@ import UserRow from "../components/UserRow"
 import { USER_FRAGMENT } from "../fragments"
 
 // [ Styles ]
-
+const Separator = styled.View`
+  width: 100%;
+  height: 1px;
+  background-color: rgba(225, 225, 225, 0.2);
+`
 // [GraphQl]
 const LIKES_QUERY = gql`
   query seePhotoLikes($id: Int!) {
@@ -36,6 +40,7 @@ const Likes = ({ route }) => {
   return (
     <ScreenLayout loading={loading}>
       <FlatList
+        ItemSeparatorComponent={() => <Separator></Separator>}
         refreshing={refreshing}
         onRefresh={onRefresh}
         data={data?.seePhotoLikes}

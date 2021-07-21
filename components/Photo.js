@@ -106,7 +106,14 @@ const Photo = ({ id, user, caption, file, isLiked, likes }) => {
 
   return (
     <Container>
-      <Header onPress={() => navigation.navigate("Profile")}>
+      <Header
+        onPress={() =>
+          navigation.navigate("Profile", {
+            username: user.username,
+            is: user.id,
+          })
+        }
+      >
         <UserAvatar resizeMode="cover" source={{ uri: user.avatar }} />
         <Username>{user.username}</Username>
       </Header>
@@ -139,7 +146,14 @@ const Photo = ({ id, user, caption, file, isLiked, likes }) => {
           </TouchableOpacity>
         )}
         <Caption>
-          <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Profile", {
+                username: user.username,
+                is: user.id,
+              })
+            }
+          >
             <Username>{user.username}</Username>
           </TouchableOpacity>
           <CaptionText>{caption}</CaptionText>
