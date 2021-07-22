@@ -4,7 +4,6 @@ import { Ionicons } from "@expo/vector-icons"
 import SharedStackNav from "./SharedStackNav"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import useUser from "../hooks/useUser"
-import Upload from "../screens/Upload"
 
 const Taps = createBottomTabNavigator()
 
@@ -56,7 +55,7 @@ const TabsNav = () => {
           return {
             tabPress: (e) => {
               e.preventDefault()
-              navigation.navigate("Upload")
+              navigation.navigate("UploadNav")
             },
           }
         }}
