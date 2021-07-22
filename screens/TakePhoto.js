@@ -1,7 +1,7 @@
 import { Camera } from "expo-camera"
 import styled from "styled-components/native"
 import { Ionicons } from "@expo/vector-icons"
-import { TouchableOpacity } from "react-native"
+import { StatusBar, TouchableOpacity } from "react-native"
 import React, { useEffect, useState } from "react"
 import Slider from "@react-native-community/slider"
 
@@ -10,6 +10,11 @@ import Slider from "@react-native-community/slider"
 const Container = styled.View`
   flex: 1;
   background-color: black;
+`
+const CloseButton = styled.TouchableOpacity`
+  position: absolute;
+  top: 20px;
+  left: 20px;
 `
 const Actions = styled.View`
   flex: 0.35;
@@ -33,7 +38,7 @@ const TakePhotoBtn = styled.TouchableOpacity`
 `
 
 // =====< Component >=====
-const TakePhoto = () => {
+const TakePhoto = ({ navigation }) => {
   // =====< Settings >=====
 
   // State
@@ -66,7 +71,9 @@ const TakePhoto = () => {
   const onFlashChange = () => {
     if (flashMode === Camera.Constants.FlashMode.off) {
       setFlashMode(Camera.Constants.FlashMode.on)
-    } else {
+    } else if (flashMode === Camera.Constants.FlashMode.on) {
+      setFlashMode(Camera.Constants.FlashMode.auto)
+    } else if (flashMode === Camera.Constants.FlashMode.auto) {
       setFlashMode(Camera.Constants.FlashMode.off)
     }
   }
@@ -79,7 +86,17 @@ const TakePhoto = () => {
   // =====< Presenter >=====
   return (
     <Container>
-      <Camera type={cameraType} style={{ flex: 1 }} zoom={zoom} />
+      <StatusBar hidden={true} />
+      <Camera
+        type={cameraType}
+        style={{ flex: 1 }}
+        zoom={zoom}
+        flashMode={flashMode}
+      >
+        <CloseButton onPress={() => navigation.navigate("Tabs")}>
+          <Ionicons name="close" color="white" size={30} />
+        </CloseButton>
+      </Camera>
       <Actions>
         <SliderContainer>
           <Slider
@@ -92,6 +109,21 @@ const TakePhoto = () => {
           />
         </SliderContainer>
         <ButtonsContainer>
+          <TouchableOpacity onPress={onFlashChange}>
+            <Ionicons
+              color="white"
+              size={30}
+              name={
+                flashMode === Camera.Constants.FlashMode.off
+                  ? "flash-off"
+                  : flashMode === Camera.Constants.FlashMode.on
+                  ? "flash"
+                  : flashMode === Camera.Constants.FlashMode.auto
+                  ? "eye"
+                  : null
+              }
+            />
+          </TouchableOpacity>
           <TakePhotoBtn />
           <TouchableOpacity onPress={onCameraSwitch}>
             <Ionicons color="white" size={30} name="camera-reverse" />
