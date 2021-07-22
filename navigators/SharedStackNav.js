@@ -1,7 +1,7 @@
 import React from "react"
 import { createStackNavigator } from "@react-navigation/stack"
 import Profile from "../screens/Profile"
-import Photo from "../screens/photo"
+import PhotoScreen from "../screens/PhotoScreen"
 import Feed from "../screens/Feed"
 import Search from "../screens/Search"
 import Notifications from "../screens/Notifications"
@@ -48,7 +48,7 @@ const SharedStackNav = ({ screenName }) => {
       ) : null}
       {screenName === "Me" ? <Stack.Screen name={"Me"} component={Me} /> : null}
       <Stack.Screen name="Profile" component={Profile} />
-      <Stack.Screen name="Photo" component={Photo} />
+      <Stack.Screen name="PhotoScreen" component={PhotoScreen} />
       <Stack.Screen name="Likes" component={Likes} />
       <Stack.Screen name="Comments" component={Comments} />
     </Stack.Navigator>

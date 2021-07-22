@@ -156,17 +156,4 @@ const Photo = ({ id, user, caption, file, isLiked, likes }) => {
   )
 }
 
-Photo.propTypes = {
-  id: PropTypes.number.isRequired,
-  user: PropTypes.shape({
-    avatar: PropTypes.string,
-    username: PropTypes.string.isRequired,
-  }),
-  caption: PropTypes.string,
-  file: PropTypes.string.isRequired,
-  isLiked: PropTypes.bool.isRequired,
-  likes: PropTypes.number.isRequired,
-  commentNumber: PropTypes.number.isRequired,
-}
-
 export default Photo
