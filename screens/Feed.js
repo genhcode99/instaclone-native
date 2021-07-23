@@ -1,10 +1,11 @@
-import { gql, useQuery } from "@apollo/client"
-import React, { useState } from "react"
-import { FlatList } from "react-native"
+import { FlatList, TouchableOpacity } from "react-native"
 import Photo from "../components/Photo"
+import { Ionicons } from "@expo/vector-icons"
+import { gql, useQuery } from "@apollo/client"
+import React, { useEffect, useState } from "react"
 import ScreenLayout from "../components/ScreenLayout"
 
-// *[ GraphQl ]*
+// =====< GraphQl >=====
 const FEED_QUERY = gql`
   query seeFeed($offset: Int!) {
     seeFeed(offset: $offset) {
@@ -36,8 +37,9 @@ const FEED_QUERY = gql`
   }
 `
 
-// *[ Component ]*
-const Feed = () => {
+// =====< Component >=====
+const Feed = ({ navigation }) => {
+  // =====< Settings >=====
   const { data, loading, refetch, fetchMore } = useQuery(FEED_QUERY, {
     variables: { offset: 0 },
   })
@@ -52,6 +54,24 @@ const Feed = () => {
   }
   const [refreshing, setRefreshing] = useState(false)
 
+  // =====< Presenter >=====
+
+  // Header Right
+  const MessagesButton = () => (
+    <TouchableOpacity
+      style={{ marginRight: 25 }}
+      onPress={() => navigation.navigate("MessagesNav")}
+    >
+      <Ionicons name="paper-plane" color="white" size={20} />
+    </TouchableOpacity>
+  )
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: MessagesButton,
+    })
+  }, [])
+
+  // Screen
   return (
     <ScreenLayout loading={loading}>
       <FlatList
