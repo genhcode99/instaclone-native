@@ -1,9 +1,10 @@
 import { Camera } from "expo-camera"
 import styled from "styled-components/native"
 import { Ionicons } from "@expo/vector-icons"
-import { StatusBar, TouchableOpacity } from "react-native"
-import React, { useEffect, useRef, useState } from "react"
+import * as MediaLibrary from "expo-media-library"
 import Slider from "@react-native-community/slider"
+import { Image, StatusBar, Text, TouchableOpacity } from "react-native"
+import React, { useEffect, useRef, useState } from "react"
 
 // =====< Style >=====
 
@@ -36,6 +37,14 @@ const TakePhotoBtn = styled.TouchableOpacity`
   border: 3px solid rgba(255, 255, 255, 0.8);
   border-radius: 50px;
 `
+const PhotoAction = styled.TouchableOpacity`
+  padding: 5px 10px;
+  border-radius: 4px;
+  background-color: white;
+`
+const PhotoActionText = styled.Text`
+  font-weight: 600;
+`
 
 // =====< Component >=====
 const TakePhoto = ({ navigation }) => {
@@ -44,6 +53,7 @@ const TakePhoto = ({ navigation }) => {
   // State
   const [ok, setOk] = useState(false)
   const [zoom, setZoom] = useState(0)
+  const [takenPhoto, setTakenPhoto] = useState("")
   const [cameraReady, setCameraReady] = useState(false)
   const [cameraType, setCameraType] = useState(Camera.Constants.Type.back)
   const [flashMode, setFlashMode] = useState(Camera.Constants.FlashMode.off)
@@ -79,18 +89,22 @@ const TakePhoto = ({ navigation }) => {
     }
   }
 
-  // 사진 촬영
+  // 사진 촬영 및 라이브러리 저장
   const camera = useRef()
   const onCameraReady = () => setCameraReady(true)
   const takePhoto = async () => {
     if (camera.current && cameraReady) {
-      const photo = await camera.current.takePictureAsync({
+      const { uri } = await camera.current.takePictureAsync({
         quality: 1,
         exif: true,
       })
-      console.log(photo)
+      setTakenPhoto(uri)
+      // const asset = await MediaLibrary.createAssetAsync(uri)
     }
   }
+
+  // 촬영된 사진 취소
+  const onDismiss = () => setTakenPhoto("")
 
   // useEffect
   useEffect(() => {
@@ -101,51 +115,69 @@ const TakePhoto = ({ navigation }) => {
   return (
     <Container>
       <StatusBar hidden={true} />
-      <Camera
-        ref={camera}
-        type={cameraType}
-        style={{ flex: 1 }}
-        zoom={zoom}
-        flashMode={flashMode}
-        onCameraReady={onCameraReady}
-      >
-        <CloseButton onPress={() => navigation.navigate("Tabs")}>
-          <Ionicons name="close" color="white" size={30} />
-        </CloseButton>
-      </Camera>
-      <Actions>
-        <SliderContainer>
-          <Slider
-            style={{ width: 200, height: 20 }}
-            minimumValue={0}
-            maximumValue={1}
-            minimumTrackTintColor="#FFFFFF"
-            maximumTrackTintColor="rgba(255, 255, 255, 0.5)"
-            onValueChange={onZoomValueChange}
-          />
-        </SliderContainer>
-        <ButtonsContainer>
-          <TouchableOpacity onPress={onFlashChange}>
-            <Ionicons
-              color="white"
-              size={30}
-              name={
-                flashMode === Camera.Constants.FlashMode.off
-                  ? "flash-off"
-                  : flashMode === Camera.Constants.FlashMode.on
-                  ? "flash"
-                  : flashMode === Camera.Constants.FlashMode.auto
-                  ? "eye"
-                  : null
-              }
+      {takenPhoto === "" ? (
+        <Camera
+          ref={camera}
+          type={cameraType}
+          style={{ flex: 1 }}
+          zoom={zoom}
+          flashMode={flashMode}
+          onCameraReady={onCameraReady}
+        >
+          <CloseButton onPress={() => navigation.navigate("Tabs")}>
+            <Ionicons name="close" color="white" size={30} />
+          </CloseButton>
+        </Camera>
+      ) : (
+        <Image source={{ uri: takenPhoto }} style={{ flex: 1 }} />
+      )}
+      {takenPhoto === "" ? (
+        <Actions>
+          <SliderContainer>
+            <Slider
+              style={{ width: 200, height: 20 }}
+              minimumValue={0}
+              maximumValue={1}
+              minimumTrackTintColor="#FFFFFF"
+              maximumTrackTintColor="rgba(255, 255, 255, 0.5)"
+              onValueChange={onZoomValueChange}
             />
-          </TouchableOpacity>
-          <TakePhotoBtn onPress={takePhoto} />
-          <TouchableOpacity onPress={onCameraSwitch}>
-            <Ionicons color="white" size={30} name="camera-reverse" />
-          </TouchableOpacity>
-        </ButtonsContainer>
-      </Actions>
+          </SliderContainer>
+          <ButtonsContainer>
+            <TouchableOpacity onPress={onFlashChange}>
+              <Ionicons
+                color="white"
+                size={30}
+                name={
+                  flashMode === Camera.Constants.FlashMode.off
+                    ? "flash-off"
+                    : flashMode === Camera.Constants.FlashMode.on
+                    ? "flash"
+                    : flashMode === Camera.Constants.FlashMode.auto
+                    ? "eye"
+                    : null
+                }
+              />
+            </TouchableOpacity>
+            <TakePhotoBtn onPress={takePhoto} />
+            <TouchableOpacity onPress={onCameraSwitch}>
+              <Ionicons color="white" size={30} name="camera-reverse" />
+            </TouchableOpacity>
+          </ButtonsContainer>
+        </Actions>
+      ) : (
+        <Actions>
+          <PhotoAction onPress={onDismiss}>
+            <PhotoActionText>Dismiss</PhotoActionText>
+          </PhotoAction>
+          <PhotoAction>
+            <PhotoActionText>Upload</PhotoActionText>
+          </PhotoAction>
+          <PhotoAction>
+            <PhotoActionText>Save & Upload</PhotoActionText>
+          </PhotoAction>
+        </Actions>
+      )}
     </Container>
   )
 }
