@@ -2,7 +2,7 @@ import { Camera } from "expo-camera"
 import styled from "styled-components/native"
 import { Ionicons } from "@expo/vector-icons"
 import { StatusBar, TouchableOpacity } from "react-native"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import Slider from "@react-native-community/slider"
 
 // =====< Style >=====
@@ -43,9 +43,10 @@ const TakePhoto = ({ navigation }) => {
 
   // State
   const [ok, setOk] = useState(false)
-  const [flashMode, setFlashMode] = useState(Camera.Constants.FlashMode.off)
   const [zoom, setZoom] = useState(0)
+  const [cameraReady, setCameraReady] = useState(false)
   const [cameraType, setCameraType] = useState(Camera.Constants.Type.back)
+  const [flashMode, setFlashMode] = useState(Camera.Constants.FlashMode.off)
 
   // 카메라 사용 승인
   const getPermission = async () => {
@@ -78,6 +79,19 @@ const TakePhoto = ({ navigation }) => {
     }
   }
 
+  // 사진 촬영
+  const camera = useRef()
+  const onCameraReady = () => setCameraReady(true)
+  const takePhoto = async () => {
+    if (camera.current && cameraReady) {
+      const photo = await camera.current.takePictureAsync({
+        quality: 1,
+        exif: true,
+      })
+      console.log(photo)
+    }
+  }
+
   // useEffect
   useEffect(() => {
     getPermission()
@@ -88,10 +102,12 @@ const TakePhoto = ({ navigation }) => {
     <Container>
       <StatusBar hidden={true} />
       <Camera
+        ref={camera}
         type={cameraType}
         style={{ flex: 1 }}
         zoom={zoom}
         flashMode={flashMode}
+        onCameraReady={onCameraReady}
       >
         <CloseButton onPress={() => navigation.navigate("Tabs")}>
           <Ionicons name="close" color="white" size={30} />
@@ -124,7 +140,7 @@ const TakePhoto = ({ navigation }) => {
               }
             />
           </TouchableOpacity>
-          <TakePhotoBtn />
+          <TakePhotoBtn onPress={takePhoto} />
           <TouchableOpacity onPress={onCameraSwitch}>
             <Ionicons color="white" size={30} name="camera-reverse" />
           </TouchableOpacity>
