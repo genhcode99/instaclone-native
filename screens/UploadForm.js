@@ -1,9 +1,12 @@
-import React, { useEffect } from "react"
-import { Controller, useForm } from "react-hook-form"
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native"
-import styled from "styled-components/native"
 import { colors } from "../colors"
+import React, { useEffect } from "react"
+import { gql } from "@apollo/client/core"
+import { useMutation } from "@apollo/client"
+import styled from "styled-components/native"
+import { Controller, useForm } from "react-hook-form"
+import { ReactNativeFile } from "apollo-upload-client"
 import DismissKeyboard from "../components/DismissKeyboard"
+import { TouchableOpacity, ActivityIndicator } from "react-native"
 
 // =====< Style >=====
 
@@ -31,6 +34,38 @@ const HeaderRightText = styled.Text`
   margin-right: 7px;
 `
 
+// =====< GraphQl >=====
+const UPLOAD_PHOTO_MUTATION = gql`
+  mutation uploadPhoto($file: Upload!, $caption: String) {
+    uploadPhoto(file: $file, caption: $caption) {
+      id
+      user {
+        id
+        bio
+        username
+        avatar
+      }
+      file
+      caption
+      likes
+      isMine
+      isLiked
+      commentNumber
+      comments {
+        id
+        user {
+          username
+          avatar
+        }
+        payload
+        isMine
+        createdAt
+      }
+      createdAt
+    }
+  }
+`
+
 // =====< Component >=====
 const UploadForm = ({ route, navigation }) => {
   // =====< Settings >=====
@@ -41,9 +76,15 @@ const UploadForm = ({ route, navigation }) => {
     handleSubmit,
     formState: { errors },
   } = useForm()
-  const onSubmit = ({ caption }) => {}
-
-  // useEffect
+  const [uploadPhotoMutation, { loading }] = useMutation(UPLOAD_PHOTO_MUTATION)
+  const onSubmit = ({ caption }) => {
+    const file = new ReactNativeFile({
+      uri: route.params.file,
+      name: "1.jpg",
+      type: "image/jpeg",
+    })
+    uploadPhotoMutation({ variables: { caption, file } })
+  }
 
   // =====< Presenter >=====
 
@@ -52,13 +93,14 @@ const UploadForm = ({ route, navigation }) => {
     <ActivityIndicator size="small" color="white" style={{ marginRight: 10 }} />
   )
   const HeaderRight = () => (
-    <TouchableOpacity onPress={() => {}}>
+    <TouchableOpacity onPress={handleSubmit(onSubmit)}>
       <HeaderRightText>Next</HeaderRightText>
     </TouchableOpacity>
   )
   useEffect(() => {
     navigation.setOptions({
-      headerRight: HeaderRightLoading,
+      headerRight: loading ? HeaderRightLoading : HeaderRight,
+      ...(loading && { headerLeft: () => null }),
     })
   }, [])
 
