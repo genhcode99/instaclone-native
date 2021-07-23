@@ -83,7 +83,7 @@ const SeletPhoto = ({ navigation }) => {
     navigation.setOptions({
       headerRight: HeaderRight,
     })
-  })
+  }, [chosenPhoto])
 
   const choosePhoto = (uri) => {
     setChosenPhoto(uri)
