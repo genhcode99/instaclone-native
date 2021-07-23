@@ -76,7 +76,28 @@ const UploadForm = ({ route, navigation }) => {
     handleSubmit,
     formState: { errors },
   } = useForm()
-  const [uploadPhotoMutation, { loading }] = useMutation(UPLOAD_PHOTO_MUTATION)
+  const updateUploadPhoto = (cache, result) => {
+    const {
+      data: { uploadPhoto },
+    } = result
+    if (uploadPhoto.id) {
+      cache.modify({
+        id: "ROOT_QUERY",
+        fields: {
+          seeFeed(prev) {
+            return [uploadPhoto, ...prev]
+          },
+        },
+      })
+    }
+    navigation.navigate("Tabs")
+  }
+  const [uploadPhotoMutation, { loading }] = useMutation(
+    UPLOAD_PHOTO_MUTATION,
+    {
+      update: updateUploadPhoto,
+    },
+  )
   const onSubmit = ({ caption }) => {
     const file = new ReactNativeFile({
       uri: route.params.file,
@@ -102,7 +123,7 @@ const UploadForm = ({ route, navigation }) => {
       headerRight: loading ? HeaderRightLoading : HeaderRight,
       ...(loading && { headerLeft: () => null }),
     })
-  }, [])
+  }, [loading])
 
   // Screen
   return (
