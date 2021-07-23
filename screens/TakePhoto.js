@@ -3,8 +3,9 @@ import styled from "styled-components/native"
 import { Ionicons } from "@expo/vector-icons"
 import * as MediaLibrary from "expo-media-library"
 import Slider from "@react-native-community/slider"
-import { Alert, Image, StatusBar, Text, TouchableOpacity } from "react-native"
+import { useIsFocused } from "@react-navigation/native"
 import React, { useEffect, useRef, useState } from "react"
+import { Alert, Image, StatusBar, Text, TouchableOpacity } from "react-native"
 
 // =====< Style >=====
 
@@ -56,6 +57,7 @@ const TakePhoto = ({ navigation }) => {
   // =====< Settings >=====
 
   // State
+  const isFocused = useIsFocused()
   const [ok, setOk] = useState(false)
   const [zoom, setZoom] = useState(0)
   const [takenPhoto, setTakenPhoto] = useState("")
@@ -110,12 +112,12 @@ const TakePhoto = ({ navigation }) => {
   // 촬영된 사진 취소
   const onDismiss = () => setTakenPhoto("")
 
-  // 사진 업로드 || 사진 저장 및 업로드
+  // 사진 저장 및 업로드 페이지 이동
   const goToUpload = async (save) => {
     if (save) {
       await MediaLibrary.saveToLibraryAsync(takenPhoto)
     }
-    console.log("will Upload")
+    navigation.navigate("UploadForm", { file: takenPhoto })
   }
   const onUpload = () => {
     Alert.alert("Library", "Save photo & upload or just upload", [
@@ -132,7 +134,7 @@ const TakePhoto = ({ navigation }) => {
   // =====< Presenter >=====
   return (
     <Container>
-      <StatusBar hidden={true} />
+      {isFocused ? <StatusBar hidden={true} /> : null}
       {takenPhoto === "" ? (
         <Camera
           ref={camera}

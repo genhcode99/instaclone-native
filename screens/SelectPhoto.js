@@ -5,12 +5,13 @@ import * as MediaLibrary from "expo-media-library"
 import {
   FlatList,
   Image,
+  StatusBar,
   TouchableOpacity,
   useWindowDimensions,
 } from "react-native"
 import { colors } from "../colors"
 
-// < STYLE > ====================
+// =====< Style >=====
 
 const Container = styled.View`
   flex: 1;
@@ -37,10 +38,10 @@ const HeaderRightText = styled.Text`
   margin-right: 7px;
 `
 
-// < COMPONENT > ====================
+// =====< Conponent >=====
 
 const SeletPhoto = ({ navigation }) => {
-  // SETTING
+  // =====< Settings >=====
 
   const { width } = useWindowDimensions()
   const [photos, setPhotos] = useState([])
@@ -71,7 +72,9 @@ const SeletPhoto = ({ navigation }) => {
   }, [])
 
   const HeaderRight = () => (
-    <TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => navigation.navigate("UploadForm", { file: chosenPhoto })}
+    >
       <HeaderRightText>Next</HeaderRightText>
     </TouchableOpacity>
   )
@@ -86,7 +89,7 @@ const SeletPhoto = ({ navigation }) => {
     setChosenPhoto(uri)
   }
 
-  // PRESENTER
+  // =====< Presenter >=====
 
   const renderItem = ({ item: photo }) => (
     <ImageContainer onPress={() => choosePhoto(photo.uri)}>
@@ -111,6 +114,7 @@ const SeletPhoto = ({ navigation }) => {
 
   return (
     <Container>
+      <StatusBar hidden={false} />
       <Top>
         {chosenPhoto !== "" ? (
           <Image
