@@ -1,12 +1,15 @@
-import { FlatList, KeyboardAvoidingView } from "react-native"
 import React, { useEffect } from "react"
 import styled from "styled-components/native"
-import { gql, useQuery } from "@apollo/client"
+import { gql, useMutation, useQuery } from "@apollo/client"
 import ScreenLayout from "../components/ScreenLayout"
+import { useForm, Controller } from "react-hook-form"
+import { View, FlatList, KeyboardAvoidingView } from "react-native"
+import { cache } from "browserslist"
+import useUser from "../hooks/useUser"
 
 // =====< Style >=====
 const MessageContainer = styled.View`
-  padding: 10px 0px;
+  padding: 0px 10px;
   flex-direction: ${(props) => (props.outGoing ? "row" : "row-reverse")};
   align-items: flex-end;
 `
@@ -67,12 +70,79 @@ const SEND_MESSAGE_MUTATION = gql`
 const Room = ({ route, navigation }) => {
   // =====< Settings >=====
 
+  // 로그인된 유저 정보
+  const { data: meData } = useUser()
+
   // 메세지 가져오기
   const { data, loading } = useQuery(ROOM_QUERY, {
     variables: { id: route?.params?.id },
   })
 
-  //
+  // 메세지 보내기
+  const {
+    control,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = useForm()
+
+  const updataSendMessage = (cache, result) => {
+    const {
+      data: {
+        sendMessage: { ok, id },
+      },
+    } = result
+    if (ok && meData) {
+      const { payload } = getValues()
+      const messageObj = {
+        id,
+        payload,
+        user: {
+          username: meData.me.username,
+          avatar: meData.me.avatar,
+        },
+        read: true,
+        __typename: "Message",
+      }
+    }
+    const messageFragment = cache.writeFragment({
+      fragment: gql`
+        fragment NewMessage on Message {
+          id
+          payload
+          user {
+            username
+            avatar
+          }
+          read
+        }
+      `,
+      data: messageObj,
+    })
+    cache.modify({
+      id: `Room:${route?.params?.id}`,
+      fields: {
+        messages(prev) {
+          return [messageFragment, ...prev]
+        },
+      },
+    })
+  }
+
+  const [sendMessageMutation, { loading: messageLoading }] = useMutation(
+    SEND_MESSAGE_MUTATION,
+    { update: updataSendMessage },
+  )
+  const onSubmit = ({ payload }) => {
+    if (!sendingMessage) {
+      sendMessageMutation({
+        variables: {
+          payload,
+          roomId: route?.params?.id,
+        },
+      })
+    }
+  }
 
   // Use Effect
   useEffect(() => {
@@ -104,17 +174,34 @@ const Room = ({ route, navigation }) => {
     >
       <ScreenLayout loading={loading}>
         <FlatList
-          inverted
-          style={{ width: "100%" }}
-          data={data?.seeRoom?.messages}
-          keyExtractor={(message) => "" + message.id}
           renderItem={renderItem}
+          data={data?.seeRoom?.messages}
+          style={{ width: "100%", paddingTop: 10 }}
+          keyExtractor={(message) => "" + message.id}
+          ItemSeparatorComponent={() => <View style={{ height: 20 }}></View>}
         />
-        <TextInput
-          placeholder="Write a message..."
-          // onSubmitEditing={}
-          returnKeyType="send"
-          placeholderTextColor="rgba(225,225,225,0.5)"
+        <Controller
+          control={control}
+          rules={{
+            required: true,
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              // 필수
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              // 옵션
+              autoCorrect={false}
+              returnKeyType="send"
+              autoCapitalize="none"
+              placeholder="Write a message..."
+              onSubmitEditing={handleSubmit(onSubmit)}
+              placeholderTextColor="rgba(225,225,225,0.5)"
+            />
+          )}
+          name="payload"
+          defaultValue=""
         />
       </ScreenLayout>
     </KeyboardAvoidingView>
