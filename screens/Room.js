@@ -5,6 +5,7 @@ import ScreenLayout from "../components/ScreenLayout"
 import { useForm, Controller } from "react-hook-form"
 import { View, FlatList, KeyboardAvoidingView } from "react-native"
 import useUser from "../hooks/useUser"
+import { Ionicons } from "@expo/vector-icons"
 
 // =====< Style >=====
 const MessageContainer = styled.View`
@@ -31,14 +32,21 @@ const Message = styled.Text`
   background-color: rgba(225, 225, 225, 0.3);
 `
 const TextInput = styled.TextInput`
-  width: 95%;
+  width: 90%;
   color: white;
-  margin-top: 25px;
   padding: 10px 20px;
-  margin-bottom: 50px;
+  margin-right: 10px;
   border-radius: 9999px;
   border: 1px solid rgba(255, 255, 255, 0.5);
 `
+const InputContainer = styled.View`
+  width: 100%;
+  margin-top: 25px;
+  margin-bottom: 50px;
+  flex-direction: row;
+  align-items: center;
+`
+const SendBtn = styled.TouchableOpacity``
 
 // =====< GraphQl >=====
 const ROOM_QUERY = gql`
@@ -79,6 +87,7 @@ const Room = ({ route, navigation }) => {
     handleSubmit,
     getValues,
     setValue,
+    watch,
     formState: { errors },
   } = useForm()
 
@@ -119,7 +128,7 @@ const Room = ({ route, navigation }) => {
         id: `Room:${route.params.id}`,
         fields: {
           messages(prev) {
-            return [...prev, messageFragment]
+            return [messageFragment, ...prev]
           },
         },
       })
@@ -176,35 +185,50 @@ const Room = ({ route, navigation }) => {
     >
       <ScreenLayout loading={loading}>
         <FlatList
+          inverted
           renderItem={renderItem}
           data={data?.seeRoom?.messages}
-          style={{ width: "100%", paddingVertical: 10 }}
           keyExtractor={(message) => "" + message.id}
+          style={{ width: "100%", marginVertical: 10 }}
           ItemSeparatorComponent={() => <View style={{ height: 20 }}></View>}
         />
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              // 필수
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              // 옵션
-              autoCorrect={false}
-              returnKeyType="send"
-              autoCapitalize="none"
-              placeholder="Write a message..."
-              onSubmitEditing={handleSubmit(onSubmit)}
-              placeholderTextColor="rgba(225,225,225,0.5)"
+        <InputContainer>
+          <Controller
+            control={control}
+            rules={{
+              required: true,
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                // 필수
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                // 옵션
+                autoCorrect={false}
+                returnKeyType="send"
+                autoCapitalize="none"
+                placeholder="Write a message..."
+                onSubmitEditing={handleSubmit(onSubmit)}
+                placeholderTextColor="rgba(225,225,225,0.5)"
+              />
+            )}
+            name="payload"
+            defaultValue=""
+          />
+          <SendBtn
+            disabled={!Boolean(watch("payload"))}
+            onPress={handleSubmit(onSubmit)}
+          >
+            <Ionicons
+              name="send"
+              color={
+                !Boolean(watch("payload")) ? "rgba(255,255,255,0.5)" : "white"
+              }
+              size={22}
             />
-          )}
-          name="payload"
-          defaultValue=""
-        />
+          </SendBtn>
+        </InputContainer>
       </ScreenLayout>
     </KeyboardAvoidingView>
   )
