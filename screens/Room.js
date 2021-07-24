@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import styled from "styled-components/native"
-import { gql, useMutation, useQuery, useSubscription } from "@apollo/client"
+import { gql, useApolloClient, useMutation, useQuery } from "@apollo/client"
 import ScreenLayout from "../components/ScreenLayout"
 import { useForm, Controller } from "react-hook-form"
 import { View, FlatList, KeyboardAvoidingView } from "react-native"
@@ -155,6 +155,40 @@ const Room = ({ route, navigation }) => {
   const { data, loading, subscribeToMore } = useQuery(ROOM_QUERY, {
     variables: { id: route?.params?.id },
   })
+
+  const client = useApolloClient()
+  const updateQuery = (prevQuery, options) => {
+    const {
+      subscriptionData: {
+        data: { roomUpdates: message },
+      },
+    } = options
+    if (message.id) {
+      const messageFragment = client.cache.writeFragment({
+        fragment: gql`
+          fragment NewMessage on Message {
+            id
+            payload
+            user {
+              username
+              avatar
+            }
+            read
+          }
+        `,
+        data: message,
+      })
+      client.cache.modify({
+        id: `Room:${route.params.id}`,
+        fields: {
+          messages(prev) {
+            return [messageFragment, ...prev]
+          },
+        },
+      })
+    }
+  }
+
   useEffect(() => {
     if (data?.seeRoom) {
       subscribeToMore({
