@@ -4,7 +4,6 @@ import { gql, useMutation, useQuery } from "@apollo/client"
 import ScreenLayout from "../components/ScreenLayout"
 import { useForm, Controller } from "react-hook-form"
 import { View, FlatList, KeyboardAvoidingView } from "react-native"
-import { cache } from "browserslist"
 import useUser from "../hooks/useUser"
 
 // =====< Style >=====
@@ -45,6 +44,7 @@ const TextInput = styled.TextInput`
 const ROOM_QUERY = gql`
   query seeRoom($id: Int!) {
     seeRoom(id: $id) {
+      id
       messages {
         id
         payload
@@ -73,20 +73,16 @@ const Room = ({ route, navigation }) => {
   // 로그인된 유저 정보
   const { data: meData } = useUser()
 
-  // 메세지 가져오기
-  const { data, loading } = useQuery(ROOM_QUERY, {
-    variables: { id: route?.params?.id },
-  })
-
   // 메세지 보내기
   const {
     control,
     handleSubmit,
     getValues,
+    setValue,
     formState: { errors },
   } = useForm()
 
-  const updataSendMessage = (cache, result) => {
+  const updateSendMessage = (cache, result) => {
     const {
       data: {
         sendMessage: { ok, id },
@@ -94,6 +90,7 @@ const Room = ({ route, navigation }) => {
     } = result
     if (ok && meData) {
       const { payload } = getValues()
+      setValue("payload", "")
       const messageObj = {
         id,
         payload,
@@ -104,37 +101,42 @@ const Room = ({ route, navigation }) => {
         read: true,
         __typename: "Message",
       }
-    }
-    const messageFragment = cache.writeFragment({
-      fragment: gql`
-        fragment NewMessage on Message {
-          id
-          payload
-          user {
-            username
-            avatar
+      const messageFragment = cache.writeFragment({
+        data: messageObj,
+        fragment: gql`
+          fragment NewMessage on Message {
+            id
+            payload
+            user {
+              username
+              avatar
+            }
+            read
           }
-          read
-        }
-      `,
-      data: messageObj,
-    })
-    cache.modify({
-      id: `Room:${route?.params?.id}`,
-      fields: {
-        messages(prev) {
-          return [messageFragment, ...prev]
+        `,
+      })
+      cache.modify({
+        id: `Room:${route.params.id}`,
+        fields: {
+          messages(prev) {
+            return [...prev, messageFragment]
+          },
         },
-      },
-    })
+      })
+    }
   }
 
   const [sendMessageMutation, { loading: messageLoading }] = useMutation(
     SEND_MESSAGE_MUTATION,
-    { update: updataSendMessage },
+    { update: updateSendMessage },
   )
+
+  const { data, loading } = useQuery(ROOM_QUERY, {
+    variables: { id: route?.params?.id },
+  })
+
   const onSubmit = ({ payload }) => {
-    if (!sendingMessage) {
+    if (!messageLoading) {
       sendMessageMutation({
         variables: {
           payload,
@@ -176,7 +178,7 @@ const Room = ({ route, navigation }) => {
         <FlatList
           renderItem={renderItem}
           data={data?.seeRoom?.messages}
-          style={{ width: "100%", paddingTop: 10 }}
+          style={{ width: "100%", paddingVertical: 10 }}
           keyExtractor={(message) => "" + message.id}
           ItemSeparatorComponent={() => <View style={{ height: 20 }}></View>}
         />
