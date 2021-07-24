@@ -1,6 +1,27 @@
-import { gql, useQuery } from "@apollo/client"
+import { FlatList, KeyboardAvoidingView } from "react-native"
 import React, { useEffect } from "react"
-import { View, Text } from "react-native"
+import styled from "styled-components/native"
+import { gql, useQuery } from "@apollo/client"
+import ScreenLayout from "../components/ScreenLayout"
+
+// =====< Style >=====
+const MessageContainer = styled.View``
+const Author = styled.View``
+const Avatar = styled.Image``
+const Username = styled.Text`
+  color: white;
+`
+const Message = styled.Text`
+  color: white;
+`
+const TextInput = styled.TextInput`
+  width: 95%;
+  margin: 0px 10px;
+  padding: 10px 20px;
+  margin-bottom: 50px;
+  border-radius: 9999px;
+  background-color: white;
+`
 
 // =====< GraphQl >=====
 const ROOM_QUERY = gql`
@@ -37,11 +58,40 @@ const Room = ({ route, navigation }) => {
 
   // =====< Presenter >=====
 
+  // Flat List
+  const renderItem = ({ item: message }) => (
+    <MessageContainer>
+      <Author>
+        <Avatar source={{ uri: message.user.avatar }} />
+        <Username>{message.user.username}</Username>
+      </Author>
+      <Message>{message.payload}</Message>
+    </MessageContainer>
+  )
+
   // Main Screen
   return (
-    <View>
-      <Text>Room</Text>
-    </View>
+    <KeyboardAvoidingView
+      behavior="height"
+      keyboardVerticalOffset={100}
+      style={{ flex: 1, backgroundColor: "black" }}
+    >
+      <ScreenLayout loading={loading}>
+        <FlatList
+          inverted
+          style={{ width: "100%" }}
+          data={data?.seeRoom?.messages}
+          keyExtractor={(message) => "" + message.id}
+          renderItem={renderItem}
+        />
+        <TextInput
+          placeholder="Write a message..."
+          // onSubmitEditing={}
+          returnKeyType="send"
+          placeholderTextColor="rgba(0,0,0,0.5)"
+        />
+      </ScreenLayout>
+    </KeyboardAvoidingView>
   )
 }
 
