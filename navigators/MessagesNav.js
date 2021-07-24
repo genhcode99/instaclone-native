@@ -9,16 +9,22 @@ const Stack = createStackNavigator()
 const MessagesNav = () => {
   return (
     <Stack.Navigator
+      mode="screen"
       screenOptions={{
         headerStyle: { backgroundColor: "black" },
         headerTintColor: "white",
         headerBackTitleVisible: false,
-        headerBackImage: () => (
-          <Ionicons name="chevron-down" color="white" size={28} />
-        ),
       }}
     >
-      <Stack.Screen name="Rooms" component={Rooms} />
+      <Stack.Screen
+        name="Rooms"
+        component={Rooms}
+        options={{
+          headerBackImage: () => (
+            <Ionicons name="chevron-down" color="white" size={30} />
+          ),
+        }}
+      />
       <Stack.Screen name="Room" component={Room} />
     </Stack.Navigator>
   )
