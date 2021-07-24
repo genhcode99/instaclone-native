@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import styled from "styled-components/native"
-import { gql, useMutation, useQuery } from "@apollo/client"
+import { gql, useMutation, useQuery, useSubscription } from "@apollo/client"
 import ScreenLayout from "../components/ScreenLayout"
 import { useForm, Controller } from "react-hook-form"
 import { View, FlatList, KeyboardAvoidingView } from "react-native"
@@ -73,6 +73,19 @@ const SEND_MESSAGE_MUTATION = gql`
     }
   }
 `
+const ROOM_UPDATES = gql`
+  subscription roomUpdates($id: Int!) {
+    roomUpdates(id: $id) {
+      id
+      payload
+      user {
+        username
+        avatar
+      }
+      read
+    }
+  }
+`
 
 // =====< Component >=====
 const Room = ({ route, navigation }) => {
@@ -90,7 +103,6 @@ const Room = ({ route, navigation }) => {
     watch,
     formState: { errors },
   } = useForm()
-
   const updateSendMessage = (cache, result) => {
     const {
       data: {
@@ -140,9 +152,18 @@ const Room = ({ route, navigation }) => {
     { update: updateSendMessage },
   )
 
-  const { data, loading } = useQuery(ROOM_QUERY, {
+  const { data, loading, subscribeToMore } = useQuery(ROOM_QUERY, {
     variables: { id: route?.params?.id },
   })
+  useEffect(() => {
+    if (data?.seeRoom) {
+      subscribeToMore({
+        document: ROOM_UPDATES,
+        variables: { id: route?.params?.id },
+        updateQuery,
+      })
+    }
+  }, [data])
 
   const onSubmit = ({ payload }) => {
     if (!messageLoading) {

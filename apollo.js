@@ -38,9 +38,9 @@ const wsLink = new WebSocketLink({
   uri: "ws://localhost:4000/subscriptions",
   options: {
     reconnect: true,
-    connectionParams: {
+    connectionParams: () => ({
       authorization: authorizationVar(),
-    },
+    }),
   },
 })
 
